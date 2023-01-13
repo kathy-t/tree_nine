@@ -1,0 +1,5 @@
+{
+  "usher_sampled_wf.diff": "data/refdiff.diff",
+  "usher_sampled_wf.ref": "data/tb-seq.fasta",
+  "usher_sampled_wf.i": "data/L1_L4.pb"
+}
