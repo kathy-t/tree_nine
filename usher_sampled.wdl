@@ -23,9 +23,10 @@ task usher_sampled_diff {
 	String detailed_clades_arg = if !(detailed_clades) then "" else "-D "
 
 	command <<<
+		matUtils summary -i ~{ref}
 		usher-sampled ~{detailed_clades_arg}--optimization_radius=~{optimization_radius} \
-			-e=~{max_uncertainty_per_sample} \
-			-E=~{max_parsimony_per_sample} \
+			-e ~{max_uncertainty_per_sample} \
+			-E ~{max_parsimony_per_sample} \
 			--diff "~{diff}" \
 			-i "~{i}" \
 			--ref "~{ref}" \
