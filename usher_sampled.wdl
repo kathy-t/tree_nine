@@ -1,5 +1,7 @@
 version 1.0
 
+import "https://raw.githubusercontent.com/aofarrel/SRANWRP/v1.1.4/tasks/processing_tasks.wdl" as processing
+
 task usher_sampled_diff {
 	input {
 		Boolean detailed_clades = false
@@ -79,16 +81,22 @@ task convert_to_taxonium {
 
 workflow usher_sampled_diff_to_taxonium {
 	input {
-		File diff
+		Array[File] diffs
 		File i
 		String outfile_usher = "newref"
 		String outfile_taxonium = "newref"
 		File ref
 	}
 
+	call processing.cat_files as cat_diff_files {
+		files = diffs
+		out_filename = cat_diff_files.txt
+		keep_only_unique_lines = false
+	}
+
 	call usher_sampled_diff {
 		input:
-			diff = diff,
+			diff = cat_diff_files.outfile,
 			i = i,
 			outfile_usher = outfile_usher,
 			ref = ref

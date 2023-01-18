@@ -1,5 +1,18 @@
 {
-  "usher_sampled_diff_to_taxonium.diff": "data/SAMEA1018926.diff",
+  "usher_sampled_diff_to_taxonium.diffs": [
+    "data/SAMEA787721.diff",
+    "data/SAMEA787735.diff",
+    "data/SAMEA2534710.diff",
+    "data/SAMEA1018926_old.diff",
+    "data/SAMEA1018926.diff",
+    "data/SAMEA1018930.diff",
+    "data/SAMEA1688504.diff",
+    "data/SAMEA1688525.diff",
+    "data/SAMEA1688562.diff",
+    "data/SAMEA1707508.diff",
+    "data/SAMEA1877075.diff",
+    "data/SAMEA2783010.diff"
+  ],
   "usher_sampled_diff_to_taxonium.ref": "data/tb-seq.fasta",
   "usher_sampled_diff_to_taxonium.i": "data/L1_L4.pb"
 }
