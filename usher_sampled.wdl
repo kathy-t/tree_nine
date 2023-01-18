@@ -17,13 +17,16 @@ task usher_sampled_diff {
 		Int cpu = 4
 		Int memory = 8
 		Int preempt = 1
+		Boolean summarize_ref_tree = false
 	}
 
 	Int disk_size = ceil(size(diff, "GB")) + ceil(size(ref, "GB")) +  ceil(size(i, "GB"))
 	String detailed_clades_arg = if !(detailed_clades) then "" else "-D "
 
 	command <<<
-		matUtils summary -i ~{ref}
+		if [ "~{summarize_ref_tree}" == "true" ]
+			matUtils summary -i ~{i} > ref_tree_summary.txt
+		fi
 		usher-sampled ~{detailed_clades_arg}--optimization_radius=~{optimization_radius} \
 			-e ~{max_uncertainty_per_sample} \
 			-E ~{max_parsimony_per_sample} \
@@ -37,7 +40,7 @@ task usher_sampled_diff {
 	runtime {
 		cpu: cpu
 		disks: "local-disk " + disk_size + " SSD"
-		docker: "quay.io/biocontainers/usher:0.6.1--h99b1ad8_1"
+		docker: "quay.io/biocontainers/usher:0.6.2--h99b1ad8_0"
 		memory: memory + " GB"
 		preemptible: preempt
 	}
@@ -45,6 +48,7 @@ task usher_sampled_diff {
 	output {
 		File usher_tree = outfile_usher + ".pb"
 		File? clades = "clades.txt" # only if detailed_clades = true
+		File? ref_tree_summary = "ref_tree_summary.txt" # only if summarize_ref_tree = true
 	}
 }
 
