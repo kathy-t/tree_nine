@@ -27,6 +27,7 @@ task usher_sampled_diff {
 
 	command <<<
 		if [ "~{summarize_ref_tree}" == "true" ]
+		then
 			matUtils summary -i ~{i} > ref_tree_summary.txt
 		fi
 		usher-sampled ~{detailed_clades_arg}--optimization_radius=~{optimization_radius} \
@@ -83,15 +84,16 @@ workflow usher_sampled_diff_to_taxonium {
 	input {
 		Array[File] diffs
 		File i
-		String outfile_usher = "newref"
-		String outfile_taxonium = "newref"
+		String outfile_usher = "newtree"
+		String outfile_taxonium = "newtree"
 		File ref
 	}
 
 	call processing.cat_files as cat_diff_files {
-		files = diffs
-		out_filename = cat_diff_files.txt
-		keep_only_unique_lines = false
+		input:
+			files = diffs,
+			out_filename = "cat_diff_files.txt",
+			keep_only_unique_lines = false
 	}
 
 	call usher_sampled_diff {
