@@ -6,12 +6,12 @@ task usher_sampled_diff {
 	input {
 		Boolean detailed_clades = false
 		File diff
-		File i
+		File? i
 		Int optimization_radius = 0
 		Int max_parsimony_per_sample = 1000000
 		Int max_uncertainty_per_sample = 1000000
 		String outfile_usher
-		File ref
+		File? ref
 
 		# WDL specific -- note that cpu does not directly set usher's
 		# threads argument, but it does affect the number of cores
@@ -83,10 +83,10 @@ task convert_to_taxonium {
 workflow usher_sampled_diff_to_taxonium {
 	input {
 		Array[File] diffs
-		File i
+		File? i
 		String outfile_usher = "newtree"
 		String outfile_taxonium = "newtree"
-		File ref
+		File? ref
 	}
 
 	call processing.cat_files as cat_diff_files {
