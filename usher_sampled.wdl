@@ -16,13 +16,14 @@ task usher_sampled_diff {
 		# WDL specific -- note that cpu does not directly set usher's
 		# threads argument, but it does affect the number of cores
 		# available for use (by default usher uses all available)
-		Int cpu = 4
-		Int memory = 8
+		Int addldisk = 10
+		Int cpu = 8
+		Int memory = 16
 		Int preempt = 1
 		Boolean summarize_ref_tree = false
 	}
 
-	Int disk_size = ceil(size(diff, "GB")) + ceil(size(ref, "GB")) +  ceil(size(i, "GB"))
+	Int disk_size = ceil(size(diff, "GB")) + ceil(size(ref, "GB")) +  ceil(size(i, "GB")) + addldisk
 	String detailed_clades_arg = if !(detailed_clades) then "" else "-D "
 
 	command <<<
