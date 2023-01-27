@@ -109,4 +109,9 @@ workflow usher_sampled_diff_to_taxonium {
 			outfile_taxonium = outfile_taxonium,
 			usher_tree = usher_sampled_diff.usher_tree
 	}
+
+	output {
+		File usher_tree = usher_sampled_diff.usher_tree
+		File taxonium_tree = convert_to_taxonium.taxonium_tree
+	}
 }
