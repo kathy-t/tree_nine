@@ -140,7 +140,6 @@ task convert_to_nextstrain {
 workflow usher_sampled_diff_to_taxonium {
 	input {
 		Array[File] diffs
-		File? new_samples
 		File? i
 		String outfile_usher = "newtree"
 		String outfile_taxonium = "newtree"
@@ -173,7 +172,7 @@ workflow usher_sampled_diff_to_taxonium {
 		input:
 			outfile_nextstrain = outfile_nextstrain,
 			usher_tree = usher_sampled_diff.usher_tree,
-			new_samples = new_samples
+			new_samples = cat_diff_files.first_lines
 	}
 
 	output {
