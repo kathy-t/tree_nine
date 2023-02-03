@@ -4,6 +4,7 @@ import "https://raw.githubusercontent.com/aofarrel/SRANWRP/v1.1.4/tasks/processi
 
 task usher_sampled_diff {
 	input {
+		Int batch_size_per_process = 5
 		Boolean detailed_clades = false
 		File diff
 		File? i
@@ -31,9 +32,10 @@ task usher_sampled_diff {
 		then
 			matUtils summary -i ~{i} > ref_tree_summary.txt
 		fi
-		usher-sampled ~{detailed_clades_arg}--optimization_radius=~{optimization_radius} \
+		usher-sampled ~{detailed_clades_arg} --optimization_radius=~{optimization_radius} \
 			-e ~{max_uncertainty_per_sample} \
 			-E ~{max_parsimony_per_sample} \
+			--batch_size_per_process ~{batch_size_per_process} \
 			--diff "~{diff}" \
 			-i "~{i}" \
 			--ref "~{ref}" \
@@ -44,7 +46,7 @@ task usher_sampled_diff {
 	runtime {
 		cpu: cpu
 		disks: "local-disk " + disk_size + " SSD"
-		docker: "quay.io/biocontainers/usher:0.6.2--h99b1ad8_0"
+		docker: "yecheng/usher:latest"
 		memory: memory + " GB"
 		preemptible: preempt
 	}
@@ -62,17 +64,23 @@ task convert_to_taxonium {
 		File usher_tree
 	}
 
-	Int disk_size = ceil(size(usher_tree, "GB"))
+	Int disk_size = ceil(size(usher_tree, "GB")) + 100
 
 	command <<<
+		echo "booted into Docker successfully"
+		echo "input file: ~{usher_tree}"
+		ls -lha ~{usher_tree}
+		echo "running usher_to_taxonium..."
 		usher_to_taxonium -i "~{usher_tree}" -o "~{outfile_taxonium}.jsonl.gz"
 	>>>
 
 	runtime {
-		cpu: 4
+		# TODO: Tone down these attributes. This is probably overkill.
+		bootDiskSizeGb: 25
+		cpu: 16
 		disks: "local-disk " + disk_size + " SSD"
 		docker: "ashedpotatoes/sranwrp:1.1.4"
-		memory: "8 GB"
+		memory: "16 GB"
 		preemptible: 1
 	}
 
