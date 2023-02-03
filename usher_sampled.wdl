@@ -1,6 +1,6 @@
 version 1.0
 
-import "https://raw.githubusercontent.com/aofarrel/SRANWRP/v1.1.4/tasks/processing_tasks.wdl" as processing
+import "https://raw.githubusercontent.com/aofarrel/SRANWRP/keep-track-of-diff-names/tasks/processing_tasks.wdl" as processing
 
 task usher_sampled_diff {
 	input {
