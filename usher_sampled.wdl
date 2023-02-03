@@ -2,6 +2,8 @@ version 1.0
 
 import "https://raw.githubusercontent.com/aofarrel/SRANWRP/keep-track-of-diff-names/tasks/processing_tasks.wdl" as processing
 
+# TODO: should eventually mark these tasks as volatile (https://cromwell.readthedocs.io/en/stable/optimizations/VolatileTasks/)
+
 task usher_sampled_diff {
 	input {
 		Int batch_size_per_process = 5
@@ -92,34 +94,57 @@ task convert_to_taxonium {
 task convert_to_nextstrain {
 	# based loosely on Marc Perry's version
 	input {
-		File tree_pb
-		#File public_meta
-		#File samples_meta
-		String prefix
-		Int treesize
-		String public_json_bucket
-		Int num_threads = 80
-		Int mem_size = 640
-		Int diskSizeGB = 375
-		File script
+		File usher_tree # aka tree_pb
+		File? new_samples
+		String outfile_nextstrain
+		Int treesize = 0
+		Int nearest_k = 500
+		Int memory = 32
+		Boolean new_samples_only = true
 	}
-    String nextstr = "https://nextstrain.org/fetch/storage.googleapis.com"
 
-    command <<<
-    	# matUtils extract -i mmm/new_usher/newtree.pb -S sample_paths.txt
-    	# cut -f1 sample_paths.txt | tail -n +2 > sample.ids
-    	# matUtils extract -i mmm/new_usher/newtree.pb -j subtree -s sample.ids -N 1
-		matUtils extract -i	~{tree_pb} -S sample_paths.txt
+	command <<<
+		# matUtils extract -i mmm/new_usher/newtree.pb -S sample_paths.txt
+		# cut -f1 sample_paths.txt | tail -n +2 > sample.ids
+		# matUtils extract -i mmm/new_usher/newtree.pb -j subtree -s sample.ids -N 1
+
+		matUtils extract -i	~{usher_tree} -S sample_paths.txt
 		cut -f1 sample_paths.txt | tail -n +2 > sample.ids
-		matUtils extract -i ~{tree_pb} -j subtree -s sample.ids
-    >>>
+
+		if [[ "~{new_samples_only}" = "true" ]]
+		then
+			matUtils extract -i ~{usher_tree} -j ~{outfile_nextstrain} -s sample.ids -N ~{treesize}
+		else
+			matUtils extract -i ~{usher_tree} -j ~{outfile_nextstrain} -s sample.ids -N ~{treesize} -K ~{new_samples}:~{nearest_k}
+		fi
+
+		ls -lha
+		
+	>>>
+
+	runtime {
+		# TODO: Tone down these attributes. This is probably overkill.
+		bootDiskSizeGb: 25
+		cpu: 16
+		disks: "local-disk " + 500 + " SSD"
+		docker: "ashedpotatoes/sranwrp:1.1.4"
+		memory: memory + " GB"
+		preemptible: 1
+	}
+
+	output {
+		Array[File] nextstrain_trees = glob("*.json")
+	}
+}
 
 workflow usher_sampled_diff_to_taxonium {
 	input {
 		Array[File] diffs
+		File? new_samples
 		File? i
 		String outfile_usher = "newtree"
 		String outfile_taxonium = "newtree"
+		String outfile_nextstrain = "newtree"
 		File? ref
 	}
 
@@ -144,8 +169,16 @@ workflow usher_sampled_diff_to_taxonium {
 			usher_tree = usher_sampled_diff.usher_tree
 	}
 
+	call convert_to_nextstrain {
+		input:
+			outfile_nextstrain = outfile_nextstrain,
+			usher_tree = usher_sampled_diff.usher_tree,
+			new_samples = new_samples
+	}
+
 	output {
 		File usher_tree = usher_sampled_diff.usher_tree
 		File taxonium_tree = convert_to_taxonium.taxonium_tree
+		Array[File] nextstrain_trees = convert_to_nextstrain.nextstrain_trees
 	}
 }
