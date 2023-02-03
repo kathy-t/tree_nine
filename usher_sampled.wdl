@@ -89,6 +89,31 @@ task convert_to_taxonium {
 	}
 }
 
+task convert_to_nextstrain {
+	# based loosely on Marc Perry's version
+	input {
+		File tree_pb
+		#File public_meta
+		#File samples_meta
+		String prefix
+		Int treesize
+		String public_json_bucket
+		Int num_threads = 80
+		Int mem_size = 640
+		Int diskSizeGB = 375
+		File script
+	}
+    String nextstr = "https://nextstrain.org/fetch/storage.googleapis.com"
+
+    command <<<
+    	# matUtils extract -i mmm/new_usher/newtree.pb -S sample_paths.txt
+    	# cut -f1 sample_paths.txt | tail -n +2 > sample.ids
+    	# matUtils extract -i mmm/new_usher/newtree.pb -j subtree -s sample.ids -N 1
+		matUtils extract -i	~{tree_pb} -S sample_paths.txt
+		cut -f1 sample_paths.txt | tail -n +2 > sample.ids
+		matUtils extract -i ~{tree_pb} -j subtree -s sample.ids
+    >>>
+
 workflow usher_sampled_diff_to_taxonium {
 	input {
 		Array[File] diffs
