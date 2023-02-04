@@ -127,7 +127,7 @@ task convert_to_nextstrain {
 		bootDiskSizeGb: 25
 		cpu: 16
 		disks: "local-disk " + 500 + " SSD"
-		docker: "ashedpotatoes/sranwrp:1.1.4"
+		docker: "yecheng/usher:latest"
 		memory: memory + " GB"
 		preemptible: 1
 	}
