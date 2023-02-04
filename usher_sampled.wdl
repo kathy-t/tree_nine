@@ -113,9 +113,9 @@ task convert_to_nextstrain {
 
 		if [[ "~{new_samples_only}" = "true" ]]
 		then
-			matUtils extract -i ~{usher_tree} -j ~{outfile_nextstrain} -s sample.ids -N ~{treesize}
+			matUtils extract -i ~{usher_tree} -j ~{outfile_nextstrain}.json -s sample.ids -N ~{treesize}
 		else
-			matUtils extract -i ~{usher_tree} -j ~{outfile_nextstrain} -s sample.ids -N ~{treesize} -K ~{new_samples}:~{nearest_k}
+			matUtils extract -i ~{usher_tree} -j ~{outfile_nextstrain}.json -s sample.ids -N ~{treesize} -K ~{new_samples}:~{nearest_k}
 		fi
 
 		ls -lha
@@ -141,6 +141,8 @@ workflow usher_sampled_diff_to_taxonium {
 	input {
 		Array[File] diffs
 		File? i
+		Array[File] coverage_reports
+		Float bad_data_threshold
 		String outfile_usher = "newtree"
 		String outfile_taxonium = "newtree"
 		String outfile_nextstrain = "newtree"
@@ -151,7 +153,9 @@ workflow usher_sampled_diff_to_taxonium {
 		input:
 			files = diffs,
 			out_filename = "cat_diff_files.txt",
-			keep_only_unique_lines = false
+			keep_only_unique_lines = false,
+			removal_candidates = coverage_reports,
+			removal_threshold = bad_data_threshold
 	}
 
 	call usher_sampled_diff {
