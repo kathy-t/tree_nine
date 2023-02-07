@@ -139,9 +139,7 @@ workflow usher_sampled_diff_to_taxonium {
 		File? i
 		Array[File] coverage_reports
 		Float bad_data_threshold
-		String outfile_usher = "newtree"
-		String outfile_taxonium = "newtree"
-		String outfile_nextstrain = "newtree"
+		String outfile = "tree"
 		File? ref
 	}
 
@@ -158,19 +156,19 @@ workflow usher_sampled_diff_to_taxonium {
 		input:
 			diff = cat_diff_files.outfile,
 			i = i,
-			outfile_usher = outfile_usher,
+			outfile_usher = outfile,
 			ref = ref
 	}
 
 	call convert_to_taxonium {
 		input:
-			outfile_taxonium = outfile_taxonium,
+			outfile_taxonium = outfile,
 			usher_tree = usher_sampled_diff.usher_tree
 	}
 
 	call convert_to_nextstrain {
 		input:
-			outfile_nextstrain = outfile_nextstrain,
+			outfile_nextstrain = outfile,
 			usher_tree = usher_sampled_diff.usher_tree,
 			new_samples = cat_diff_files.first_lines
 	}
