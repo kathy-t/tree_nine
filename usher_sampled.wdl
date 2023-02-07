@@ -81,7 +81,7 @@ task convert_to_taxonium {
 		bootDiskSizeGb: 25
 		cpu: 16
 		disks: "local-disk " + disk_size + " SSD"
-		docker: "ashedpotatoes/sranwrp:1.1.4"
+		docker: "ashedpotatoes/sranwrp:1.1.6"
 		memory: "16 GB"
 		preemptible: 1
 	}
@@ -104,18 +104,14 @@ task convert_to_nextstrain {
 	}
 
 	command <<<
-		# matUtils extract -i mmm/new_usher/newtree.pb -S sample_paths.txt
-		# cut -f1 sample_paths.txt | tail -n +2 > sample.ids
-		# matUtils extract -i mmm/new_usher/newtree.pb -j subtree -s sample.ids -N 1
 
-		matUtils extract -i	~{usher_tree} -S sample_paths.txt
-		cut -f1 sample_paths.txt | tail -n +2 > sample.ids
-
-		if [[ "~{new_samples_only}" = "true" ]]
+		if [[ "~{new_samples_only}" = "false" ]]
 		then
+			matUtils extract -i	~{usher_tree} -S sample_paths.txt
+			cut -f1 sample_paths.txt | tail -n +2 > sample.ids
 			matUtils extract -i ~{usher_tree} -j ~{outfile_nextstrain}.json -s sample.ids -N ~{treesize}
 		else
-			matUtils extract -i ~{usher_tree} -j ~{outfile_nextstrain}.json -s sample.ids -N ~{treesize} -K ~{new_samples}:~{nearest_k}
+			matUtils extract -i ~{usher_tree} -j ~{outfile_nextstrain}.json -K ~{new_samples}:~{nearest_k}
 		fi
 
 		ls -lha
