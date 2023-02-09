@@ -98,7 +98,7 @@ task convert_to_nextstrain {
 		File? new_samples
 		String outfile_nextstrain
 		Int treesize = 0
-		Int nearest_k = 500
+		Int nearest_k = 250
 		Int memory = 32
 		Boolean new_samples_only = true
 	}
@@ -111,7 +111,7 @@ task convert_to_nextstrain {
 			cut -f1 sample_paths.txt | tail -n +2 > sample.ids
 			matUtils extract -i ~{usher_tree} -j ~{outfile_nextstrain}.json -s sample.ids -N ~{treesize}
 		else
-			matUtils extract -i ~{usher_tree} -j ~{outfile_nextstrain}.json -K ~{new_samples}:~{nearest_k}
+			matUtils extract -i ~{usher_tree} -j ~{outfile_nextstrain}.json -s ~{new_samples} -N ~{nearest_k}
 		fi
 
 		ls -lha
