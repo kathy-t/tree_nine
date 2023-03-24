@@ -161,9 +161,14 @@ task convert_to_nextstrain {
 			cut -f1 sample_paths.txt | tail -n +2 > sample.ids
 			matUtils extract -i ~{usher_tree} -j ~{outfile_nextstrain}.json -s sample.ids -N ~{treesize}
 		else
-			matUtils extract -i ~{usher_tree} -j ~{outfile_nextstrain}.json -s ~{new_samples} -N ~{nearest_k}
+			if [[ "~{new_samples}" == "" ]]
+			then
+				echo "Error -- new_samples_only is true, but no new_samples files was provided."
+				exit 1
+			else
+				matUtils extract -i ~{usher_tree} -j ~{outfile_nextstrain}.json -s ~{new_samples} -N ~{nearest_k}
+			fi
 		fi
-
 		ls -lha
 		
 	>>>

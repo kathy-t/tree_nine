@@ -1,5 +1,7 @@
 # Tree Nine
 Put diff files on an existing phylogenetic tree using [UShER](https://www.nature.com/articles/s41588-021-00862-7)'s `usher sampled` task, followed by conversion to taxonium and Nextstrain formats.
+
+Verified on Terra-Cromwell and miniwdl. Make sure to add --copy-input-files for miniwdl.
  
 ## inputs
 | type    	        | var                        	| default 	| description                                                           |
@@ -27,5 +29,5 @@ Put diff files on an existing phylogenetic tree using [UShER](https://www.nature
 <sup>‡</sup>ie, how many times should a preemptible be used for this task before trying a non-preemptible?  
 
 
-## How to remove samples with bad coverage
+## how to remove samples with bad coverage
 If you created your diff files using [myco](https://github.com/aofarrel/myco), report files will be output alongside your diff files. Put these reports in as **coverage_reports** and set **bad_data_threshold** as the lowpass threshold for which you want to filter out files. For example, if you want to get rid of any sample for which has 5% or more low coverage sites, set **bad_data_threshold** to 0.05
