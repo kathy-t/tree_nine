@@ -6,10 +6,10 @@ import "https://raw.githubusercontent.com/aofarrel/SRANWRP/main/tasks/processing
 
 workflow usher_sampled_diff_to_taxonium {
 	input {
-		# all inputs here are required (some are marked optional to get around WDL limitations)
+		# these three inputs are required (some are marked optional to get around WDL limitations)
 		Array[File] diffs
 		File? input_mutation_annotated_tree  # equivalent to UShER's i argument
-		File? ref
+		File? ref                            # equivalent to USHER's ref argument
 
 		# actually optional inputs
 		Float? bad_data_threshold
@@ -112,8 +112,8 @@ task usher_sampled_diff {
 
 task convert_to_taxonium {
 	input {
-		String outfile_taxonium = "taxonium"
 		File usher_tree
+		String outfile_taxonium = "taxonium"
 	}
 
 	Int disk_size = ceil(size(usher_tree, "GB")) + 100
@@ -146,11 +146,11 @@ task convert_to_nextstrain {
 	input {
 		File usher_tree # aka tree_pb
 		File? new_samples
-		String outfile_nextstrain = "nextstrain"
 		Int treesize = 0
 		Int nearest_k = 250
 		Int memory = 32
 		Boolean new_samples_only = true
+		String outfile_nextstrain = "nextstrain"
 	}
 
 	command <<<
