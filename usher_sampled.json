@@ -14,5 +14,5 @@
     "data/SAMEA2783010.diff"
   ],
   "usher_sampled_diff_to_taxonium.ref": "data/tb-seq.fasta",
-  "usher_sampled_diff_to_taxonium.i": "data/L1_L4.pb"
+  "usher_sampled_diff_to_taxonium.input_mutation_annotated_tree": "data/L1_L4.pb"
 }

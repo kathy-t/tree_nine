@@ -4,20 +4,23 @@ Put diff files on an existing phylogenetic tree using [UShER](https://www.nature
 ## inputs
 | type    	        | var                        	| default 	| description                                                           |
 |--------------     |----------------------------	|---------	|-----------------------------------------------------------------------|
-| Int               | bad_data_threshold            |        	| remove files with coverage below this amount                          |
+| Int?              | bad_data_threshold            |        	| remove files with coverage below this amount                          |
+| Array[File]?      | coverage_reports              |        	| "reports" output from [myco](https://github.com/aofarrel/myco)        |
 | Int     	        | cpu                        	| 4       	| [Cloud only] number of cores<sup>†</sup> available                    |
-| Boolean 	        | detailed_clades            	| false   	| identical to usher equivalent                                         |
+| Boolean? 	        | detailed_clades            	| false   	| identical to usher equivalent                                         |
 | File    	        | diff                       	|         	| identical to usher equivalent                                         |
 | File?<sup>*</sup> | input_mutation_annotated_tree |         	| identical to usher i                                                  |
-| Int           	| max_parsimony_per_sample   	| 1000000 	| identical to usher equivalent                                         |
-| Int           	| max_uncertainty_per_sample 	| 1000000 	| identical to usher equivalent                                         |
-| Int           	| memory                     	| 8       	| [Cloud only] memory                                                   |
-| Int     	        | optimization_radius        	| 0       	| identical to usher equivalent                                         |
-| String        	| outfile_taxonium           	| "newtree"	| filename (no extension) of output taxonium tree                       |
-| String        	| outfile_usher              	| "newtree"	| identical to usher equivalent                                         |
-| Int           	| preempt                    	| 1       	| [GCP only] preemptible attempts<sup>‡</sup>                           |
+| Int?           	| max_parsimony_per_sample   	| 1000000 	| identical to usher equivalent                                         |
+| Int?           	| max_uncertainty_per_sample 	| 1000000 	| identical to usher equivalent                                         |
+| Int?           	| memory                     	| 8       	| [Cloud only] memory                                                   |
+| Int?     	        | optimization_radius        	| 0       	| identical to usher equivalent                                         |
+| String?        	| outfile                    	|        	| filename (no extension) to use on all output trees (overrides outfile_\*)  |
+| String?        	| outfile_nextstrain           	| "nextstrain"	| filename (no extension) of output nextstrain tree(s)                       |
+| String?        	| outfile_taxonium           	| "taxonium"	| filename (no extension) of output taxonium tree                       |
+| String?        	| outfile_usher              	| "usher"	| filename (no extension) of output usher tree                          |
+| Int?           	| preempt                    	| 1       	| [GCP only] preemptible attempts<sup>‡</sup>                           |
 | File?<sup>*</sup> | ref                           |         	| identical to usher equivalent                                         |
-| Boolean 	        | summarize_ref_tree         	| false   	| if true, run `matUtils summary` on input tree before adding anything  |
+| Boolean? 	        | summarize_ref_tree         	| false   	| if true, run `matUtils summary` on input tree before adding anything  |
 
 <sup>*</sup>these shouldn't be considered optional -- they are marked as such to work around a WDL-specific limitation  
 <sup>†</sup>does not directly set the `threads` value for usher, but by default usher will use all available cores  
