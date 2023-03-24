@@ -1,5 +1,5 @@
-# usher-sampled-wdl
- Unofficial partial WDLization of [UShER](https://www.nature.com/articles/s41588-021-00862-7)'s `usher sampled` task, followed by conversion to taxonium.
+# Tree Nine
+Put diff files on an existing phylogenic tree using [UShER](https://www.nature.com/articles/s41588-021-00862-7)'s `usher sampled` task, followed by conversion to taxonium and Nextstrain formats.
  
 ## inputs
 | type    	| var                        	| default 	| description                                                           |
