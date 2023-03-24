@@ -4,6 +4,56 @@ import "https://raw.githubusercontent.com/aofarrel/SRANWRP/main/tasks/processing
 
 # TODO: should eventually mark these tasks as volatile (https://cromwell.readthedocs.io/en/stable/optimizations/VolatileTasks/)
 
+workflow usher_sampled_diff_to_taxonium {
+	input {
+		# these three inputs are required (some are marked optional to get around WDL limitations)
+		Array[File] diffs
+		File? input_mutation_annotated_tree  # equivalent to UShER's i argument
+		File? ref                            # equivalent to USHER's ref argument
+
+		# actually optional inputs
+		Float? bad_data_threshold
+		Array[File]? coverage_reports
+		String? outfile
+	}
+
+	call processing.cat_files as cat_diff_files {
+		input:
+			files = diffs,
+			out_filename = "cat_diff_files.txt",
+			keep_only_unique_lines = false,
+			removal_candidates = coverage_reports,
+			removal_threshold = bad_data_threshold
+	}
+
+	call usher_sampled_diff {
+		input:
+			diff = cat_diff_files.outfile,
+			i = input_mutation_annotated_tree,
+			outfile_usher = outfile,
+			ref = ref
+	}
+
+	call convert_to_taxonium {
+		input:
+			outfile_taxonium = outfile,
+			usher_tree = usher_sampled_diff.usher_tree
+	}
+
+	call convert_to_nextstrain {
+		input:
+			outfile_nextstrain = outfile,
+			usher_tree = usher_sampled_diff.usher_tree,
+			new_samples = cat_diff_files.first_lines
+	}
+
+	output {
+		File usher_tree = usher_sampled_diff.usher_tree
+		File taxonium_tree = convert_to_taxonium.taxonium_tree
+		Array[File] nextstrain_trees = convert_to_nextstrain.nextstrain_trees
+	}
+}
+
 task usher_sampled_diff {
 	input {
 		Int batch_size_per_process = 5
@@ -13,7 +63,7 @@ task usher_sampled_diff {
 		Int optimization_radius = 0
 		Int max_parsimony_per_sample = 1000000
 		Int max_uncertainty_per_sample = 1000000
-		String outfile_usher
+		String outfile_usher = "usher"
 		File? ref
 
 		# WDL specific -- note that cpu does not directly set usher's
@@ -62,8 +112,8 @@ task usher_sampled_diff {
 
 task convert_to_taxonium {
 	input {
-		String outfile_taxonium
 		File usher_tree
+		String outfile_taxonium = "taxonium"
 	}
 
 	Int disk_size = ceil(size(usher_tree, "GB")) + 100
@@ -96,11 +146,11 @@ task convert_to_nextstrain {
 	input {
 		File usher_tree # aka tree_pb
 		File? new_samples
-		String outfile_nextstrain
 		Int treesize = 0
 		Int nearest_k = 250
 		Int memory = 32
 		Boolean new_samples_only = true
+		String outfile_nextstrain = "nextstrain"
 	}
 
 	command <<<
@@ -111,9 +161,14 @@ task convert_to_nextstrain {
 			cut -f1 sample_paths.txt | tail -n +2 > sample.ids
 			matUtils extract -i ~{usher_tree} -j ~{outfile_nextstrain}.json -s sample.ids -N ~{treesize}
 		else
-			matUtils extract -i ~{usher_tree} -j ~{outfile_nextstrain}.json -s ~{new_samples} -N ~{nearest_k}
+			if [[ "~{new_samples}" == "" ]]
+			then
+				echo "Error -- new_samples_only is true, but no new_samples files was provided."
+				exit 1
+			else
+				matUtils extract -i ~{usher_tree} -j ~{outfile_nextstrain}.json -s ~{new_samples} -N ~{nearest_k}
+			fi
 		fi
-
 		ls -lha
 		
 	>>>
@@ -130,52 +185,5 @@ task convert_to_nextstrain {
 
 	output {
 		Array[File] nextstrain_trees = glob("*.json")
-	}
-}
-
-workflow usher_sampled_diff_to_taxonium {
-	input {
-		Array[File] diffs
-		File? i
-		Array[File] coverage_reports
-		Float bad_data_threshold
-		String outfile = "tree"
-		File? ref
-	}
-
-	call processing.cat_files as cat_diff_files {
-		input:
-			files = diffs,
-			out_filename = "cat_diff_files.txt",
-			keep_only_unique_lines = false,
-			removal_candidates = coverage_reports,
-			removal_threshold = bad_data_threshold
-	}
-
-	call usher_sampled_diff {
-		input:
-			diff = cat_diff_files.outfile,
-			i = i,
-			outfile_usher = outfile,
-			ref = ref
-	}
-
-	call convert_to_taxonium {
-		input:
-			outfile_taxonium = outfile,
-			usher_tree = usher_sampled_diff.usher_tree
-	}
-
-	call convert_to_nextstrain {
-		input:
-			outfile_nextstrain = outfile,
-			usher_tree = usher_sampled_diff.usher_tree,
-			new_samples = cat_diff_files.first_lines
-	}
-
-	output {
-		File usher_tree = usher_sampled_diff.usher_tree
-		File taxonium_tree = convert_to_taxonium.taxonium_tree
-		Array[File] nextstrain_trees = convert_to_nextstrain.nextstrain_trees
 	}
 }
