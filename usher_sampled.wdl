@@ -91,11 +91,12 @@ task convert_to_taxonium {
 	}
 }
 
-task convert_to_nextstrain {
+task convert_to_nextstrain_subtrees {
 	# based loosely on Marc Perry's version
 	input {
 		File usher_tree # aka tree_pb
 		File? new_samples
+		
 		String outfile_nextstrain
 		Int treesize = 0
 		Int nearest_k = 250
@@ -142,6 +143,7 @@ workflow usher_sampled_diff_to_taxonium {
 		Float bad_data_threshold
 		String outfile = "tree"
 		File? ref
+		Boolean nextstrain_subtrees = true
 	}
 
 	call processing.cat_files as cat_diff_files {
@@ -167,11 +169,19 @@ workflow usher_sampled_diff_to_taxonium {
 			usher_tree = usher_sampled_diff.usher_tree
 	}
 
-	call convert_to_nextstrain {
-		input:
-			outfile_nextstrain = outfile,
-			usher_tree = usher_sampled_diff.usher_tree,
-			new_samples = cat_diff_files.first_lines
+	if (nextstrain_subtrees) {
+		call convert_to_nextstrain {
+			input:
+				outfile_nextstrain = outfile,
+				usher_tree = usher_sampled_diff.usher_tree,
+				new_samples = cat_diff_files.first_lines
+		}
+	}
+	if (!nextstrain_subtrees) {
+		call convert_to_nextstrain {
+			input:
+				
+		}
 	}
 
 	output {
