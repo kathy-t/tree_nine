@@ -4,6 +4,56 @@ import "https://raw.githubusercontent.com/aofarrel/SRANWRP/main/tasks/processing
 
 # TODO: should eventually mark these tasks as volatile (https://cromwell.readthedocs.io/en/stable/optimizations/VolatileTasks/)
 
+workflow usher_sampled_diff_to_taxonium {
+	input {
+		# all inputs are required (some are marked optional to get around WDL limitations)
+		Float bad_data_threshold
+		Array[File] coverage_reports
+		Array[File] diffs
+		File? input_mutation_annotated_tree  # equivalent to UShER's i argument
+		String outfile = "tree"
+		File? ref
+
+		# actually optional inputs
+	}
+
+	call processing.cat_files as cat_diff_files {
+		input:
+			files = diffs,
+			out_filename = "cat_diff_files.txt",
+			keep_only_unique_lines = false,
+			removal_candidates = coverage_reports,
+			removal_threshold = bad_data_threshold
+	}
+
+	call usher_sampled_diff {
+		input:
+			diff = cat_diff_files.outfile,
+			i = input_mutation_annotated_tree,
+			outfile_usher = outfile,
+			ref = ref
+	}
+
+	call convert_to_taxonium {
+		input:
+			outfile_taxonium = outfile,
+			usher_tree = usher_sampled_diff.usher_tree
+	}
+
+	call convert_to_nextstrain {
+		input:
+			outfile_nextstrain = outfile,
+			usher_tree = usher_sampled_diff.usher_tree,
+			new_samples = cat_diff_files.first_lines
+	}
+
+	output {
+		File usher_tree = usher_sampled_diff.usher_tree
+		File taxonium_tree = convert_to_taxonium.taxonium_tree
+		Array[File] nextstrain_trees = convert_to_nextstrain.nextstrain_trees
+	}
+}
+
 task usher_sampled_diff {
 	input {
 		Int batch_size_per_process = 5
@@ -130,52 +180,5 @@ task convert_to_nextstrain {
 
 	output {
 		Array[File] nextstrain_trees = glob("*.json")
-	}
-}
-
-workflow usher_sampled_diff_to_taxonium {
-	input {
-		Array[File] diffs
-		File? i
-		Array[File] coverage_reports
-		Float bad_data_threshold
-		String outfile = "tree"
-		File? ref
-	}
-
-	call processing.cat_files as cat_diff_files {
-		input:
-			files = diffs,
-			out_filename = "cat_diff_files.txt",
-			keep_only_unique_lines = false,
-			removal_candidates = coverage_reports,
-			removal_threshold = bad_data_threshold
-	}
-
-	call usher_sampled_diff {
-		input:
-			diff = cat_diff_files.outfile,
-			i = i,
-			outfile_usher = outfile,
-			ref = ref
-	}
-
-	call convert_to_taxonium {
-		input:
-			outfile_taxonium = outfile,
-			usher_tree = usher_sampled_diff.usher_tree
-	}
-
-	call convert_to_nextstrain {
-		input:
-			outfile_nextstrain = outfile,
-			usher_tree = usher_sampled_diff.usher_tree,
-			new_samples = cat_diff_files.first_lines
-	}
-
-	output {
-		File usher_tree = usher_sampled_diff.usher_tree
-		File taxonium_tree = convert_to_taxonium.taxonium_tree
-		Array[File] nextstrain_trees = convert_to_nextstrain.nextstrain_trees
 	}
 }
