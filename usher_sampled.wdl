@@ -122,14 +122,15 @@ task convert_to_nextstrain {
 		# TODO: Tone down these attributes. This is probably overkill.
 		bootDiskSizeGb: 25
 		cpu: 16
-		disks: "local-disk " + 500 + " SSD"
+		disks: "local-disk " + 250 + " SSD"
 		docker: "yecheng/usher:latest"
 		memory: memory + " GB"
 		preemptible: 1
 	}
 
 	output {
-		Array[File] nextstrain_trees = glob("*.json")
+		Array[File] nextstrain_subtrees = glob("*.json")
+		File nextstrain_singular_tree = outfile_nextstrain+".json"
 	}
 }
 
@@ -176,6 +177,7 @@ workflow usher_sampled_diff_to_taxonium {
 	output {
 		File usher_tree = usher_sampled_diff.usher_tree
 		File taxonium_tree = convert_to_taxonium.taxonium_tree
-		Array[File] nextstrain_trees = convert_to_nextstrain.nextstrain_trees
+		File nextstrain_tree = convert_to_nextstrain.nextstrain_tree
+		Array[File] nextstrain_subtrees = convert_to_nextstrain.nextstrain_subtrees
 	}
 }
