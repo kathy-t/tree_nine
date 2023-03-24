@@ -14,6 +14,7 @@ workflow usher_sampled_diff_to_taxonium {
 		# actually optional inputs
 		Float? bad_data_threshold
 		Array[File]? coverage_reports
+		Boolean make_nextstrain_subtrees = true
 		String? outfile
 	}
 
@@ -23,7 +24,8 @@ workflow usher_sampled_diff_to_taxonium {
 			out_filename = "cat_diff_files.txt",
 			keep_only_unique_lines = false,
 			removal_candidates = coverage_reports,
-			removal_threshold = bad_data_threshold
+			removal_threshold = bad_data_threshold,
+			output_first_lines = true
 	}
 
 	call usher_sampled_diff {
@@ -40,26 +42,27 @@ workflow usher_sampled_diff_to_taxonium {
 			usher_tree = usher_sampled_diff.usher_tree
 	}
 
-	if (nextstrain_subtrees) {
-		call convert_to_nextstrain {
+	if (make_nextstrain_subtrees) {
+		call convert_to_nextstrain_subtrees {
 			input:
 				outfile_nextstrain = outfile,
 				usher_tree = usher_sampled_diff.usher_tree,
 				new_samples = cat_diff_files.first_lines
 		}
 	}
-	if (!nextstrain_subtrees) {
-		call convert_to_nextstrain {
+	if (!make_nextstrain_subtrees) {
+		call convert_to_nextstrain_single {
 			input:
-				
+				outfile_nextstrain = outfile,
+				usher_tree = usher_sampled_diff.usher_tree
 		}
 	}
 
 	output {
 		File usher_tree = usher_sampled_diff.usher_tree
 		File taxonium_tree = convert_to_taxonium.taxonium_tree
-		File? nextstrain_tree = convert_to_nextstrain.nextstrain_tree
-		Array[File]? nextstrain_subtrees = convert_to_nextstrain.nextstrain_subtrees
+		File? nextstrain_tree = convert_to_nextstrain_single.nextstrain_singular_tree
+		Array[File]? nextstrain_subtrees = convert_to_nextstrain_subtrees.nextstrain_subtrees
 	}
 }
 
@@ -194,6 +197,31 @@ task convert_to_nextstrain_subtrees {
 
 	output {
 		Array[File] nextstrain_subtrees = glob("*.json")
+	}
+}
+
+task convert_to_nextstrain_single {
+	input {
+		File usher_tree # aka tree_pb
+		Int memory = 32
+		String outfile_nextstrain = "nextstrain"
+	}
+
+	command <<<
+		matUtils extract -i ~{usher_tree} -j ~{outfile_nextstrain}.json
+	>>>
+
+	runtime {
+		# TODO: Tone down these attributes. This is probably overkill.
+		bootDiskSizeGb: 25
+		cpu: 16
+		disks: "local-disk " + 250 + " SSD"
+		docker: "yecheng/usher:latest"
+		memory: memory + " GB"
+		preemptible: 1
+	}
+
+	output {
 		File nextstrain_singular_tree = outfile_nextstrain+".json"
 	}
 }
