@@ -12,6 +12,7 @@ Verified on Terra-Cromwell and miniwdl. Make sure to add `--copy-input-files` fo
 | Boolean? 	        | detailed_clades            	| false   	| identical to usher equivalent                                         |
 | File    	        | diff                       	|         	| identical to usher equivalent                                         |
 | File?<sup>*</sup> | input_mutation_annotated_tree |         	| identical to usher i                                                  |
+| Boolean           | make_nextstrain_subtrees      | true   	| if true, make Nextstrain subtrees; if false, make one big Nextstrain tree (which might lag in Auspice)  |
 | Int?           	| max_parsimony_per_sample   	| 1000000 	| identical to usher equivalent                                         |
 | Int?           	| max_uncertainty_per_sample 	| 1000000 	| identical to usher equivalent                                         |
 | Int?           	| memory                     	| 8       	| [Cloud only] memory                                                   |
