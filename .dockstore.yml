@@ -3,7 +3,7 @@ workflows:
   - name: tree_nine
     subclass: WDL
     primaryDescriptorPath: /tree_nine.wdl
-    readMePath: /doc/README.md
+    readMePath: /README.md
     authors:
       - orcid: 0000-0003-4896-1858
     testParameterFiles:
