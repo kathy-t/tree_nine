@@ -1,4 +1,4 @@
-L1_L4.pb is a draft reference tree using a bunch of lineage 1 and lineage 4 diffs (see L1_L4_samples.txt) created with 1.0.0 (commit 11884) of Lily's script.
+L1_L4.pb is a draft reference tree using a bunch of lineage 1 and lineage 4 diffs (see L1_L4_samples.txt) created with 1.0.0 (commit 11884) of Lily's script. **This data is now known to have some issues with it, so this data should not be used for published analysis -- just use it for testing the workflow!**
 
 
 | diff                  | lineage   | commit | `wc -l`|
