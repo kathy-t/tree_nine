@@ -1,6 +1,6 @@
 version 1.0
 
-import "https://raw.githubusercontent.com/aofarrel/SRANWRP/v1.1.8/tasks/processing_tasks.wdl" as processing
+import "https://raw.githubusercontent.com/aofarrel/SRANWRP/v1.1.11/tasks/processing_tasks.wdl" as processing
 
 # TODO: should eventually mark these tasks as volatile (https://cromwell.readthedocs.io/en/stable/optimizations/VolatileTasks/)
 
@@ -12,7 +12,7 @@ workflow usher_sampled_diff_to_taxonium {
 		File? ref                            # equivalent to USHER's ref argument
 
 		# actually optional inputs
-		Float? bad_data_threshold
+		Float? max_low_coverage_sites
 		Array[File]? coverage_reports
 		Boolean make_nextstrain_subtrees = true
 		String? outfile
@@ -24,7 +24,7 @@ workflow usher_sampled_diff_to_taxonium {
 			out_filename = "cat_diff_files.txt",
 			keep_only_unique_lines = false,
 			removal_candidates = coverage_reports,
-			removal_threshold = bad_data_threshold,
+			removal_threshold = max_low_coverage_sites,
 			output_first_lines = true
 	}
 
