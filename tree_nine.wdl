@@ -90,6 +90,7 @@ task usher_sampled_diff {
 
 	Int disk_size = ceil(size(diff, "GB")) + ceil(size(ref, "GB")) +  ceil(size(i, "GB")) + addldisk
 	String detailed_clades_arg = if !(detailed_clades) then "" else "-D "
+	String reference = select_first([ref, "/ref/R00000039_repregions.bed"])
 
 	command <<<
 		if [ "~{summarize_ref_tree}" == "true" ]
@@ -102,7 +103,7 @@ task usher_sampled_diff {
 			--batch_size_per_process ~{batch_size_per_process} \
 			--diff "~{diff}" \
 			-i "~{i}" \
-			--ref "~{ref}" \
+			--ref "~{reference}" \
 			-o "~{outfile_usher}.pb"
 		ls
 	>>>
@@ -110,7 +111,7 @@ task usher_sampled_diff {
 	runtime {
 		cpu: cpu
 		disks: "local-disk " + disk_size + " SSD"
-		docker: "yecheng/usher:latest"
+		docker: "ashedpotatoes/usher-plus:0.0.1"
 		memory: memory + " GB"
 		preemptible: preempt
 	}
