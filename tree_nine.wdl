@@ -90,7 +90,7 @@ task usher_sampled_diff {
 
 	Int disk_size = ceil(size(diff, "GB")) + ceil(size(ref, "GB")) +  ceil(size(i, "GB")) + addldisk
 	String detailed_clades_arg = if !(detailed_clades) then "" else "-D "
-	String reference = select_first([ref, "/ref/R00000039_repregions.bed"])
+	String reference = select_first([ref, "/ref/Ref.H37Rv/ref.fa"])
 
 	command <<<
 		if [ "~{summarize_ref_tree}" == "true" ]
