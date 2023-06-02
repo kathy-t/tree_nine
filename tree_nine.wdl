@@ -1,6 +1,6 @@
 version 1.0
 
-import "https://raw.githubusercontent.com/aofarrel/SRANWRP/main/tasks/processing_tasks.wdl" as processing
+import "https://raw.githubusercontent.com/aofarrel/SRANWRP/v1.1.12/tasks/processing_tasks.wdl" as processing
 
 # TODO: should eventually mark these tasks as volatile (https://cromwell.readthedocs.io/en/stable/optimizations/VolatileTasks/)
 
@@ -121,6 +121,10 @@ task usher_sampled_diff {
 		File? clades = "clades.txt" # only if detailed_clades = true
 		File? ref_tree_summary = "ref_tree_summary.txt" # only if summarize_ref_tree = true
 	}
+
+	meta {
+		volatile: true
+	}
 }
 
 task convert_to_taxonium {
@@ -140,9 +144,8 @@ task convert_to_taxonium {
 	>>>
 
 	runtime {
-		# TODO: Tone down these attributes. This is probably overkill.
-		bootDiskSizeGb: 25
-		cpu: 16
+		bootDiskSizeGb: 15
+		cpu: 12
 		disks: "local-disk " + disk_size + " SSD"
 		docker: "ashedpotatoes/sranwrp:1.1.6"
 		memory: "16 GB"
@@ -187,10 +190,9 @@ task convert_to_nextstrain_subtrees {
 	>>>
 
 	runtime {
-		# TODO: Tone down these attributes. This is probably overkill.
-		bootDiskSizeGb: 25
-		cpu: 16
-		disks: "local-disk " + 250 + " SSD"
+		bootDiskSizeGb: 15
+		cpu: 12
+		disks: "local-disk " + 150 + " SSD"
 		docker: "yecheng/usher:latest"
 		memory: memory + " GB"
 		preemptible: 1
@@ -213,10 +215,9 @@ task convert_to_nextstrain_single {
 	>>>
 
 	runtime {
-		# TODO: Tone down these attributes. This is probably overkill.
-		bootDiskSizeGb: 25
-		cpu: 16
-		disks: "local-disk " + 250 + " SSD"
+		bootDiskSizeGb: 15
+		cpu: 12
+		disks: "local-disk " + 150 + " SSD"
 		docker: "yecheng/usher:latest"
 		memory: memory + " GB"
 		preemptible: 1
