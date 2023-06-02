@@ -1,6 +1,6 @@
 version 1.0
 
-import "https://raw.githubusercontent.com/aofarrel/SRANWRP/v1.1.11/tasks/processing_tasks.wdl" as processing
+import "https://raw.githubusercontent.com/aofarrel/SRANWRP/v1.1.12/tasks/processing_tasks.wdl" as processing
 
 # TODO: should eventually mark these tasks as volatile (https://cromwell.readthedocs.io/en/stable/optimizations/VolatileTasks/)
 
@@ -90,6 +90,7 @@ task usher_sampled_diff {
 
 	Int disk_size = ceil(size(diff, "GB")) + ceil(size(ref, "GB")) +  ceil(size(i, "GB")) + addldisk
 	String detailed_clades_arg = if !(detailed_clades) then "" else "-D "
+	String reference = select_first([ref, "/HOME/usher/ref/Ref.H37Rv/ref.fa"])
 
 	command <<<
 		if [ "~{summarize_ref_tree}" == "true" ]
@@ -102,7 +103,7 @@ task usher_sampled_diff {
 			--batch_size_per_process ~{batch_size_per_process} \
 			--diff "~{diff}" \
 			-i "~{i}" \
-			--ref "~{ref}" \
+			--ref "~{reference}" \
 			-o "~{outfile_usher}.pb"
 		ls
 	>>>
@@ -110,7 +111,7 @@ task usher_sampled_diff {
 	runtime {
 		cpu: cpu
 		disks: "local-disk " + disk_size + " SSD"
-		docker: "yecheng/usher:latest"
+		docker: "ashedpotatoes/usher-plus:0.0.1"
 		memory: memory + " GB"
 		preemptible: preempt
 	}
@@ -119,6 +120,10 @@ task usher_sampled_diff {
 		File usher_tree = outfile_usher + ".pb"
 		File? clades = "clades.txt" # only if detailed_clades = true
 		File? ref_tree_summary = "ref_tree_summary.txt" # only if summarize_ref_tree = true
+	}
+
+	meta {
+		volatile: true
 	}
 }
 
@@ -139,9 +144,8 @@ task convert_to_taxonium {
 	>>>
 
 	runtime {
-		# TODO: Tone down these attributes. This is probably overkill.
-		bootDiskSizeGb: 25
-		cpu: 16
+		bootDiskSizeGb: 15
+		cpu: 12
 		disks: "local-disk " + disk_size + " SSD"
 		docker: "ashedpotatoes/sranwrp:1.1.6"
 		memory: "16 GB"
@@ -186,10 +190,9 @@ task convert_to_nextstrain_subtrees {
 	>>>
 
 	runtime {
-		# TODO: Tone down these attributes. This is probably overkill.
-		bootDiskSizeGb: 25
-		cpu: 16
-		disks: "local-disk " + 250 + " SSD"
+		bootDiskSizeGb: 15
+		cpu: 12
+		disks: "local-disk " + 150 + " SSD"
 		docker: "yecheng/usher:latest"
 		memory: memory + " GB"
 		preemptible: 1
@@ -212,10 +215,9 @@ task convert_to_nextstrain_single {
 	>>>
 
 	runtime {
-		# TODO: Tone down these attributes. This is probably overkill.
-		bootDiskSizeGb: 25
-		cpu: 16
-		disks: "local-disk " + 250 + " SSD"
+		bootDiskSizeGb: 15
+		cpu: 12
+		disks: "local-disk " + 150 + " SSD"
 		docker: "yecheng/usher:latest"
 		memory: memory + " GB"
 		preemptible: 1
