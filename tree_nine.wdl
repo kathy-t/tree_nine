@@ -1,6 +1,6 @@
 version 1.0
 
-import "https://raw.githubusercontent.com/aofarrel/SRANWRP/v1.1.11/tasks/processing_tasks.wdl" as processing
+import "https://raw.githubusercontent.com/aofarrel/SRANWRP/main/tasks/processing_tasks.wdl" as processing
 
 # TODO: should eventually mark these tasks as volatile (https://cromwell.readthedocs.io/en/stable/optimizations/VolatileTasks/)
 
@@ -90,7 +90,7 @@ task usher_sampled_diff {
 
 	Int disk_size = ceil(size(diff, "GB")) + ceil(size(ref, "GB")) +  ceil(size(i, "GB")) + addldisk
 	String detailed_clades_arg = if !(detailed_clades) then "" else "-D "
-	String reference = select_first([ref, "/ref/Ref.H37Rv/ref.fa"])
+	String reference = select_first([ref, "/HOME/usher/ref/Ref.H37Rv/ref.fa"])
 
 	command <<<
 		if [ "~{summarize_ref_tree}" == "true" ]
