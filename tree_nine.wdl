@@ -6,16 +6,21 @@ import "https://raw.githubusercontent.com/aofarrel/SRANWRP/v1.1.12/tasks/process
 
 workflow usher_sampled_diff_to_taxonium {
 	input {
-		# these three inputs are required (some are marked optional to get around WDL limitations)
+		# these inputs are required (some are marked optional to get around WDL limitations)
 		Array[File] diffs
 		File? input_mutation_annotated_tree  # equivalent to UShER's i argument
-		File? ref                            # equivalent to USHER's ref argument
 
 		# actually optional inputs
 		Float? max_low_coverage_sites
 		Array[File]? coverage_reports
 		Boolean make_nextstrain_subtrees = true
 		String? outfile
+		File? ref                            # equivalent to USHER's ref argument
+	}
+
+	parameter_meta {
+		diffs: "Array of diff files"
+		input_
 	}
 
 	call processing.cat_files as cat_diff_files {
@@ -125,6 +130,29 @@ task usher_sampled_diff {
 	meta {
 		volatile: true
 	}
+}
+
+task annotate {
+	input {
+		File input_tree
+		File metadata_tsv # only can annotate one column at a time
+
+		Boolean summarize = false
+		String outfile_usher = "annotated"		
+	}
+	command <<< 
+	matUtils annotate -i "~{input_tree}" -c "~{metadata_tsv}" -o "~{outfile_usher}.pb"
+	if [[ "~{summarize}" = true ]]
+	then
+		matUtils summary -i "~{outfile_usher}.pb" -C samplecladeinfo.tsv
+	fi
+	>>>
+
+	output {
+		File usher_tree = outfile_usher + ".pb"
+		File? clades = "samplecladeinfo.tsv" # only if summarize = true
+	}
+
 }
 
 task convert_to_taxonium {
