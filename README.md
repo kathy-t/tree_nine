@@ -1,7 +1,7 @@
 # Tree Nine
 Put diff files on an existing phylogenetic tree using [UShER](https://www.nature.com/articles/s41588-021-00862-7)'s `usher sampled` task with a bit of help from [SRANWRP](https://www.github.com/aofarrel/SRANWRP), followed by conversion to taxonium and Nextstrain/Auspice formats. Auspice sometimes struggles to load a large bacterial phylo tree, so there is the option to output subtrees instead of one very large tree.
 
-Verified on Terra-Cromwell and miniwdl. Make sure to add `--copy-input-files` for miniwdl.
+Verified on Terra-Cromwell and miniwdl. Make sure to add `--copy-input-files` for miniwdl. Default inputs assume you're working with _Mycobacterium tuberculosis_, be sure to change them if you aren't working with that bacterium.
  
 ## inputs
 | type    	        | var                        	| default 	| description                                                           |
