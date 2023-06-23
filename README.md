@@ -6,28 +6,27 @@ Verified on Terra-Cromwell and miniwdl. Make sure to add `--copy-input-files` fo
 ## inputs
 | type    	        | var                        	| default 	| description                                                           |
 |--------------     |----------------------------	|---------	|-----------------------------------------------------------------------|
-| Int?              | bad_data_threshold            |        	| remove files with coverage below this amount for bad data filtering   |
 | Array[File]?      | coverage_reports              |        	| "reports" output from [myco](https://github.com/aofarrel/myco) for bad data filtering  |
-| Int     	        | cpu                        	| 4       	| [Cloud only] number of cores<sup>†</sup> available                    |
+| Int     	        | cpu                        	| (varies) 	| [Cloud only] number of cores<sup>†</sup> available                    |
 | Boolean? 	        | detailed_clades            	| false   	| identical to usher equivalent                                         |
-| File    	        | diff                       	|         	| identical to usher equivalent                                         |
-| File?<sup>*</sup> | input_mutation_annotated_tree |         	| identical to usher i                                                  |
+| Array[File]       | diff                       	|         	| identical to usher equivalent                                         |
+| File?             | input_mutation_annotated_tree | <sup>‡</sup> | identical to usher i                                              |
 | Boolean           | make_nextstrain_subtrees      | true   	| if true, make Nextstrain subtrees; if false, make one big Nextstrain tree (which might lag in Auspice)  |
+| Float?            | max_low_coverage_sites        |        	| remove files with coverage below this amount for bad data filtering   |
 | Int?           	| max_parsimony_per_sample   	| 1000000 	| identical to usher equivalent                                         |
 | Int?           	| max_uncertainty_per_sample 	| 1000000 	| identical to usher equivalent                                         |
-| Int?           	| memory                     	| 8       	| [Cloud only] memory                                                   |
+| Int?           	| memory                     	| (varies)	| [Cloud only] memory                                                   |
+| File?           	| metadata_tsv                	|        	| TSV with metadata to annotate (currently unused)                      |
 | Int?     	        | optimization_radius        	| 0       	| identical to usher equivalent                                         |
-| String?        	| outfile                    	|        	| filename (no extension) to use on all output trees (overrides outfile_\*) |
-| String?        	| outfile_nextstrain           	| "nextstrain"	| filename (no extension) of output nextstrain tree(s)              |
-| String?        	| outfile_taxonium           	| "taxonium"	| filename (no extension) of output taxonium tree                   |
-| String?        	| outfile_usher              	| "usher"	| filename (no extension) of output usher tree                          |
-| Int?           	| preempt                    	| 1       	| [GCP only] preemptible attempts<sup>‡</sup>                           |
-| File?             | ref                           |         	| identical to usher equivalent, will fallback on H37rv if not provided |
-| Boolean? 	        | summarize_ref_tree         	| false   	| if true, run `matUtils summary` on input tree before adding anything  |
+| String?        	| out_prefix           	        | "tree"	| prefix for all outputs                                                |
+| Int?           	| preempt                    	| 1       	| [GCP only] preemptible attempts                                       |
+| File?             | ref                           | H37Rv 	| identical to usher equivalent                                         |
+| String?        	| reroot_to_this_node           |        	| reroot output tree to this node - **do NOT define this if you don't want to reroot**              |
+| String?        	| subtree_only_new_samples      | true   	| if true and if `make_nextstrain_subtrees` true, subtrees will only be focused on samples added by your diffs              |
 
-<sup>*</sup>this shouldn't be considered optional -- they are marked as such to work around a WDL-specific limitation  
+
 <sup>†</sup>does not directly set the `threads` value for usher, but by default usher will use all available cores  
-<sup>‡</sup>ie, how many times should a preemptible be used for this task before trying a non-preemptible?  
+<sup>‡</sup>a sample .pb created from SRA data is present in this repo and the Docker image used by this workflow, and it will be the fallback input mat if not provided by the user -- **but this default tree should only be used for debugging purposes** 
 
 
 ## how to remove samples with bad coverage
