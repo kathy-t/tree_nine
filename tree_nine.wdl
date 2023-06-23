@@ -61,6 +61,7 @@ workflow usher_sampled_diff_to_taxonium {
 
 	call usher_sampled_diff {
 		input:
+			detailed_clades = detailed_clades,
 			diff = cat_diff_files.outfile,
 			input_mat = input_mutation_annotated_tree,
 			output_mat = out_prefix + out_raw_pb + ".pb",
@@ -93,7 +94,8 @@ workflow usher_sampled_diff_to_taxonium {
 			input:
 				input_mat = usher_tree,
 				outfile_nextstrain = out_prefix + out_nextstrain + ".json",
-				new_samples = cat_diff_files.first_lines
+				new_samples = cat_diff_files.first_lines,
+				new_samples_only = subtree_only_new_samples
 		}
 	}
 	if (!make_nextstrain_subtrees) {
@@ -143,7 +145,7 @@ workflow usher_sampled_diff_to_taxonium {
 task usher_sampled_diff {
 	input {
 		Int batch_size_per_process = 5
-		Boolean detailed_clades = false
+		Boolean detailed_clades
 		File diff
 		File? input_mat
 		Int optimization_radius = 0
@@ -370,7 +372,7 @@ task convert_to_nextstrain_subtrees {
 		Int treesize = 0
 		Int nearest_k = 250
 		Int memory = 32
-		Boolean new_samples_only = true
+		Boolean new_samples_only
 		String outfile_nextstrain = "nextstrain"
 	}
 
