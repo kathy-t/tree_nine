@@ -169,24 +169,40 @@ task usher_sampled_diff {
 
 	Int disk_size = ceil(size(diff, "GB")) + ceil(size(ref_genome, "GB")) +  ceil(size(input_mat, "GB")) + addldisk
 	String D = if !(detailed_clades) then "" else "-D "
-	String ref = select_first([ref_genome, "/HOME/usher/ref/Ref.H37Rv/ref.fa"])
-	String i = select_first([input_mat, "/HOME/usher/example_tree/tb_alldiffs_mask2ref.L.fixed.pb"])
+	#String ref = select_first([ref_genome, "/HOME/usher/ref/Ref.H37Rv/ref.fa"])
+	#String i = select_first([input_mat, "/HOME/usher/example_tree/tb_alldiffs_mask2ref.L.fixed.pb"])
 
 	command <<<
-		ls -lha /HOME/usher/
-		echo "~{diff}"
-		echo "~{i}"
-		echo "~{ref}"
-		echo "~{output_mat}"
+		if [[ "~{input_mat}" = "" ]]
+		then
+			i="/HOME/usher/example_tree/tb_alldiffs_mask2ref.L.fixed.pb"
+		else
+			i="~{input_mat}"
+		fi
+
+		if [[ "~{ref_genome}" = "" ]]
+		then
+			ref="/HOME/usher/ref/Ref.H37Rv/ref.fa"
+		else
+			ref="~{ref_genome}"
+		fi
+		
+		echo "~{input_mat}"
+		echo $i
+		echo "~{ref_genome}"
+		echo $ref
+		echo "------------------"
+		ls -lha
+		echo "------------------"
+
 		usher-sampled ~{D} --optimization_radius=~{optimization_radius} \
 			-e ~{max_uncertainty_per_sample} \
 			-E ~{max_parsimony_per_sample} \
 			--batch_size_per_process ~{batch_size_per_process} \
 			--diff "~{diff}" \
-			-i "~{i}" \
-			--ref "~{ref}" \
+			-i "$i" \
+			--ref "$ref" \
 			-o "~{output_mat}"
-		ls
 	>>>
 
 	runtime {

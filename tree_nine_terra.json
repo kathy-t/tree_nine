@@ -13,6 +13,5 @@
     "gs://topmed_workflow_testing/tb/sra/SAMEA1877075.diff",
     "gs://topmed_workflow_testing/tb/sra/SAMEA2783010.diff"
   ],
-  "Tree_Nine.input_mutation_annotated_tree": "gs://topmed_workflow_testing/tb/alldiffs_mask2ref.L.fixed.pb
-  "
+  "Tree_Nine.input_mutation_annotated_tree": "gs://topmed_workflow_testing/tb/alldiffs_mask2ref.L.fixed.pb"
 }
