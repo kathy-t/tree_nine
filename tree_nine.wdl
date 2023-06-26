@@ -18,6 +18,7 @@ workflow usher_sampled_diff_to_taxonium {
 		Boolean detailed_clades = false
 		Boolean make_nextstrain_subtrees = true
 		Boolean subtree_only_new_samples = true
+		Boolean summarize_input_mat = true
 		String? reroot_to_this_node
 		File? ref_genome                     # equivalent to USHER's ref argument
 		File? metadata_tsv
@@ -46,6 +47,7 @@ workflow usher_sampled_diff_to_taxonium {
 		reroot_to_this_node: "Reroot the output tree relative to this node, leave blank to not reroot"
 		out_prefix: "Prefix for all output files"
 		subtree_only_new_samples: "If true and if make_nextstrain_subtrees true, nextstrain subtrees will only be focused on newly samples (ie samples added by your diffs)"
+		summarize_input_mat: "If true and if an input tree is passed in, summarize that input tree"
 	}
 
 	call processing.cat_files as cat_diff_files {
@@ -56,6 +58,17 @@ workflow usher_sampled_diff_to_taxonium {
 			removal_candidates = coverage_reports,
 			removal_threshold = max_low_coverage_sites,
 			output_first_lines = true
+	}
+
+	if((summarize_input_mat)) {
+		if (defined(input_mutation_annotated_tree)) {
+			String basename_input_mat = basename(select_first([input_mutation_annotated_tree, ""]))
+			call summarize as summarize_input_tree {
+				input:
+					input_mat = input_mutation_annotated_tree,
+					prefix_outs = "input_" + basename_input_mat
+			}
+		}
 	}
 
 	call usher_sampled_diff {
@@ -70,7 +83,7 @@ workflow usher_sampled_diff_to_taxonium {
 	if(defined(reroot_to_this_node)) {
 		call summarize as summarize_output_before_reroot {
 			input:
-				input_mat = usher_sampled_diff.usher_tree
+				input_mat = usher_sampled_diff.usher_tree,
 		}
 
 		call reroot {
@@ -160,7 +173,6 @@ task usher_sampled_diff {
 		Int cpu = 8
 		Int memory = 16
 		Int preempt = 1
-		Boolean summarize_ref_tree = false
 	}
 
 	Int disk_size = ceil(size(diff, "GB")) + ceil(size(ref_genome, "GB")) +  ceil(size(input_mat, "GB")) + addldisk
@@ -169,11 +181,11 @@ task usher_sampled_diff {
 	String i = select_first([input_mat, "/HOME/usher/example_tree/tb_alldiffs_mask2ref.L.fixed.pb"])
 
 	command <<<
-		if [ "~{summarize_ref_tree}" == "true" ]
-		then
-			matUtils summary -i ~{i} > ref_tree_summary.txt
-		fi
 		ls -lha /HOME/usher/
+		echo "~{diff}"
+		echo "~{i}"
+		echo "~{ref}"
+		echo "~{output_mat}"
 		usher-sampled ~{D} --optimization_radius=~{optimization_radius} \
 			-e ~{max_uncertainty_per_sample} \
 			-E ~{max_parsimony_per_sample} \
