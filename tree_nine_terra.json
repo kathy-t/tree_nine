@@ -1,0 +1,18 @@
+{
+  "Tree_Nine.diffs": [
+    "gs://topmed_workflow_testing/tb/sra/SAMEA787721.diff",
+    "gs://topmed_workflow_testing/tb/sra/SAMEA787735.diff",
+    "gs://topmed_workflow_testing/tb/sra/SAMEA2534710.diff",
+    "gs://topmed_workflow_testing/tb/sra/SAMEA1018926_old.diff",
+    "gs://topmed_workflow_testing/tb/sra/SAMEA1018926.diff",
+    "gs://topmed_workflow_testing/tb/sra/SAMEA1018930.diff",
+    "gs://topmed_workflow_testing/tb/sra/SAMEA1688504.diff",
+    "gs://topmed_workflow_testing/tb/sra/SAMEA1688525.diff",
+    "gs://topmed_workflow_testing/tb/sra/SAMEA1688562.diff",
+    "gs://topmed_workflow_testing/tb/sra/SAMEA1707508.diff",
+    "gs://topmed_workflow_testing/tb/sra/SAMEA1877075.diff",
+    "gs://topmed_workflow_testing/tb/sra/SAMEA2783010.diff"
+  ],
+  "Tree_Nine.input_mutation_annotated_tree": "gs://topmed_workflow_testing/tb/alldiffs_mask2ref.L.fixed.pb
+  "
+}

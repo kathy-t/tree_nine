@@ -2,7 +2,7 @@ version 1.0
 
 import "https://raw.githubusercontent.com/aofarrel/SRANWRP/cat_file_debugging/tasks/processing_tasks.wdl" as processing
 
-workflow usher_sampled_diff_to_taxonium {
+workflow Tree_Nine {
 	input {
 		# these inputs are required (some are marked optional to get around WDL limitations)
 		Array[File] diffs

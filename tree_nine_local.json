@@ -1,5 +1,5 @@
 {
-  "usher_sampled_diff_to_taxonium.diffs": [
+  "Tree_Nine.diffs": [
     "data/SAMEA787721.diff",
     "data/SAMEA787735.diff",
     "data/SAMEA2534710.diff",
@@ -13,5 +13,5 @@
     "data/SAMEA1877075.diff",
     "data/SAMEA2783010.diff"
   ],
-  "usher_sampled_diff_to_taxonium.input_mutation_annotated_tree": "data/L1_L4.pb"
+  "Tree_Nine.input_mutation_annotated_tree": "data/L1_L4.pb"
 }
