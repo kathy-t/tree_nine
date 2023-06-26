@@ -1,8 +1,6 @@
 version 1.0
 
-import "https://raw.githubusercontent.com/aofarrel/SRANWRP/v1.1.12/tasks/processing_tasks.wdl" as processing
-
-# TODO: should eventually mark these tasks as volatile (https://cromwell.readthedocs.io/en/stable/optimizations/VolatileTasks/)
+import "https://raw.githubusercontent.com/aofarrel/SRANWRP/cat_file_debugging/tasks/processing_tasks.wdl" as processing
 
 workflow usher_sampled_diff_to_taxonium {
 	input {
@@ -81,7 +79,7 @@ workflow usher_sampled_diff_to_taxonium {
 	}
 
 	if(defined(reroot_to_this_node)) {
-		call summarize as summarize_output_before_reroot {
+		call summarize as summarize_output_tree_before_reroot {
 			input:
 				input_mat = usher_sampled_diff.usher_tree,
 		}
@@ -118,13 +116,7 @@ workflow usher_sampled_diff_to_taxonium {
 		}
 	}
 
-	call summarize as summarize_input {
-		input:
-			input_mat = input_mutation_annotated_tree,
-			prefix_outs = in_prefix_summary
-	}
-
-	call summarize as summarize_output {
+	call summarize as summarize_output_tree {
 		input:
 			input_mat = usher_tree,
 			prefix_outs = out_prefix_summary
@@ -148,9 +140,9 @@ workflow usher_sampled_diff_to_taxonium {
 		Array[File]? nextstrain_subtrees = convert_to_nextstrain_subtrees.nextstrain_subtrees
 
 		# summaries
-		File summary_input = summarize_input.summary
-		File summary_output = summarize_output.summary
-		File? summary_output_before_reroot = summarize_output_before_reroot.summary
+		File? summary_input = summarize_input_tree.summary
+		File summary_output = summarize_output_tree.summary
+		File? summary_output_before_reroot = summarize_output_tree_before_reroot.summary
 	}
 }
 
