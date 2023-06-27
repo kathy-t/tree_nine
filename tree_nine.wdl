@@ -82,6 +82,7 @@ workflow Tree_Nine {
 		call summarize as summarize_output_tree_before_reroot {
 			input:
 				input_mat = usher_sampled_diff.usher_tree,
+				prefix_outs = "before_reroot"
 		}
 
 		call reroot {
@@ -216,7 +217,6 @@ task usher_sampled_diff {
 	output {
 		File usher_tree = output_mat
 		File? clades = "clades.txt" # only if detailed_clades = true
-		File? ref_tree_summary = "ref_tree_summary.txt" # only if summarize_ref_tree = true
 	}
 
 	meta {
