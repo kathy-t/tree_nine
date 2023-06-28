@@ -6,7 +6,7 @@ workflow Summarize_UShER_Tree {
         File pb_tree
     }
 
-    String basename_input_mat = basename(pb_tree)
+    String basename_input_mat = basename(pb_tree, ".pb")
 
     call treenine.summarize as get_info {
         input:
