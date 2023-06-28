@@ -1,17 +1,20 @@
 {
   "Tree_Nine.diffs": [
-    "data/SAMEA787721.diff",
-    "data/SAMEA787735.diff",
-    "data/SAMEA2534710.diff",
-    "data/SAMEA1018926_old.diff",
-    "data/SAMEA1018926.diff",
-    "data/SAMEA1018930.diff",
-    "data/SAMEA1688504.diff",
-    "data/SAMEA1688525.diff",
-    "data/SAMEA1688562.diff",
-    "data/SAMEA1707508.diff",
-    "data/SAMEA1877075.diff",
-    "data/SAMEA2783010.diff"
+    "data/SAMEA10029749.diff",
+    "data/SAMEA10029753.diff",
+    "data/SAMEA10029792.diff",
+    "data/SAMEA10029813.diff",
+    "data/SAMEA10029822.diff",
+    "data/SAMEA10029828.diff",
+    "data/SAMEA104684942.diff"
   ],
-  "Tree_Nine.input_mutation_annotated_tree": "data/L1_L4.pb"
+  "Tree_Nine.coverage_reports": [
+    "data/SAMEA10029749.report",
+    "data/SAMEA10029753.report",
+    "data/SAMEA10029792.report",
+    "data/SAMEA10029813.report",
+    "data/SAMEA10029822.report",
+    "data/SAMEA10029828.report",
+    "data/SAMEA104684942.report"
+  ]
 }
