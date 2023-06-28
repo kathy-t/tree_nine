@@ -31,3 +31,6 @@ Verified on Terra-Cromwell and miniwdl. Make sure to add `--copy-input-files` fo
 
 ## how to remove samples with bad coverage
 If you created your diff files using [myco](https://github.com/aofarrel/myco), report files will be output alongside your diff files. Put these reports in as **coverage_reports** and set **bad_data_threshold** as the lowpass threshold for which you want to filter out files. For example, if you want to get rid of any sample for which has 5% or more low coverage sites, set **bad_data_threshold** to 0.05
+
+## bogus fallbacks?
+WDL does not properly understand mutual exclusivity. 

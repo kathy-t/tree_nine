@@ -17,7 +17,7 @@ workflow Tree_Nine {
 		Boolean make_nextstrain_subtrees = true
 		Boolean subtree_only_new_samples = true
 		Boolean summarize_input_mat = true
-		String? reroot_to_this_node
+		String? reroot_to_this_node          # equivalent to matUtils extract's y argument
 		File? ref_genome                     # equivalent to USHER's ref argument
 		File? metadata_tsv
 
@@ -55,8 +55,11 @@ workflow Tree_Nine {
 			keep_only_unique_lines = false,
 			removal_candidates = coverage_reports,
 			removal_threshold = max_low_coverage_sites,
-			output_first_lines = true
+			output_first_lines = true,
+			first_lines_out_filename = "samples_added.txt"
 	}
+
+	File new_samples_added = select_first([cat_diff_files.first_lines, usher_sampled_diff.usher_tree]) # bogus fallback
 
 	if((summarize_input_mat)) {
 		if (defined(input_mutation_annotated_tree)) {
@@ -127,23 +130,35 @@ workflow Tree_Nine {
 		call annotate {
 			input:
 				input_mat = usher_tree,
-				metadata_tsv = select_first([metadata_tsv, usher_sampled_diff.usher_tree]),
+				metadata_tsv = select_first([metadata_tsv, usher_sampled_diff.usher_tree]), # bogus fallback
 				outfile_annotated = out_prefix + out_annotated_pb + ".pb"
 		}
 	}
 
 	output {
-		# trees
-		File usher_tree_raw = usher_sampled_diff.usher_tree
-		File? usher_tree_rerooted = reroot.rerooted_tree
-		File taxonium_tree = convert_to_taxonium.taxonium_tree
-		File? nextstrain_tree = convert_to_nextstrain_single.nextstrain_singular_tree
-		Array[File]? nextstrain_subtrees = convert_to_nextstrain_subtrees.nextstrain_subtrees
+		# trees - protobuff
+		File usher_tree_raw = usher_sampled_diff.usher_tree                                   # always
+		File? usher_tree_rerooted = reroot.rerooted_tree                                      # iff defined(reroot_to_this_node)
+
+		# trees - other formats
+		#
+		# iff defined(reroot_to_this_node), these are based on usher_tree_rerooted
+		# else, these are based on usher_tree_raw (and usher_tree_rerooted doesn't exist)
+		File taxonium_tree = convert_to_taxonium.taxonium_tree                                # always
+		File? nextstrain_tree = convert_to_nextstrain_single.nextstrain_singular_tree         # mutually exclusive with nextstrain_subtrees
+		Array[File]? nextstrain_subtrees = convert_to_nextstrain_subtrees.nextstrain_subtrees # mutually exclusive with nextstrain_tree
 
 		# summaries
-		File? summary_input = summarize_input_tree.summary
-		File summary_output = summarize_output_tree.summary
-		File? summary_output_before_reroot = summarize_output_tree_before_reroot.summary
+		File? summary_input = summarize_input_tree.summary                                    # iff summarize_input_mat
+		File summary_output = summarize_output_tree.summary                                   # always
+		File? summary_output_before_reroot = summarize_output_tree_before_reroot.summary      # iff defined(reroot_to_this_node)
+
+		# sample information
+		File? samples_input_tree = summarize_input_tree.samples                                # iff summarize_input_mat
+		File samples_output_tree = summarize_output_tree.samples                               # always
+		File? samples_output_tree_before_reroot = summarize_output_tree_before_reroot.samples  # iff defined(reroot_to_this_node)
+		Array[String] samples_added = read_lines(new_samples_added)                            # always
+		Array[String] samples_dropped = cat_diff_files.removed_files                           # always
 	}
 }
 
