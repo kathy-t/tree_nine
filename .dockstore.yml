@@ -9,3 +9,9 @@ workflows:
     testParameterFiles:
       - /tree_nine_terra.json
       - /tree_nine_local.json
+  - name: summarize_usher_tree
+    subclass: WDL
+    primaryDescriptorPath: /summarize.wdl
+    readMePath: /README.md
+    authors:
+      - orcid: 0000-0003-4896-1858
