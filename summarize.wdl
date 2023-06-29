@@ -1,5 +1,5 @@
 version 1.0
-import "https://raw.githubusercontent.com/aofarrel/tree_nine/annotations-and-summaries/tree_nine.wdl" as treenine
+import "./tree_nine.wdl" as treenine
 
 workflow Summarize_UShER_Tree {
     input {
