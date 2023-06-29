@@ -23,13 +23,15 @@ workflow Tree_Nine {
 
 		# output file names, extension not included
 		String out_prefix         = "tree"
-		String out_diffs          = "_combined"
-		String out_raw_pb         = "_raw"
-		String out_taxonium       = "_taxonium"
-		String out_nextstrain     = "_auspice"
-		String out_annotated_pb   = "_annotated"
 		String out_prefix_summary = out_prefix + "_"
 		String in_prefix_summary  = basename(select_first([input_mutation_annotated_tree, "tb_alldiffs_mask2ref.L.fixed"]))
+		String out_diffs               = "_combined"
+		String out_tree_annotated_pb   = "_annotated"
+		String out_tree_nextstrain     = "_auspice"
+		String out_tree_nwk            = "_nwk"
+		String out_tree_taxonium       = "_taxonium"
+		String out_tree_raw_pb         = "_raw"
+		
 	}
 
 	parameter_meta {
@@ -77,7 +79,7 @@ workflow Tree_Nine {
 			detailed_clades = detailed_clades,
 			diff = cat_diff_files.outfile,
 			input_mat = input_mutation_annotated_tree,
-			output_mat = out_prefix + out_raw_pb + ".pb",
+			output_mat = out_prefix + out_tree_raw_pb + ".pb",
 			ref_genome = ref_genome
 	}
 
@@ -97,17 +99,23 @@ workflow Tree_Nine {
 
 	File usher_tree = select_first([reroot.rerooted_tree, usher_sampled_diff.usher_tree])
 
+	call convert_to_newick {
+		input:
+			input_mat = usher_tree,
+			outfile_nwk = out_prefix + out_tree_nwk + ".nwk"
+	}
+
 	call convert_to_taxonium {
 		input:
 			input_mat = usher_tree,
-			outfile_taxonium = out_prefix + out_taxonium + ".jsonl.gz"
+			outfile_taxonium = out_prefix + out_tree_taxonium + ".jsonl.gz"
 	}
 
 	if (make_nextstrain_subtrees) {
 		call convert_to_nextstrain_subtrees {
 			input:
 				input_mat = usher_tree,
-				outfile_nextstrain = out_prefix + out_nextstrain + ".json",
+				outfile_nextstrain = out_prefix + out_tree_nextstrain + ".json",
 				new_samples = cat_diff_files.first_lines,
 				new_samples_only = subtree_only_new_samples
 		}
@@ -116,7 +124,7 @@ workflow Tree_Nine {
 		call convert_to_nextstrain_single {
 			input:
 				input_mat = usher_tree,
-				outfile_nextstrain = out_prefix + out_nextstrain + ".json"
+				outfile_nextstrain = out_prefix + out_tree_nextstrain + ".json"
 		}
 	}
 
@@ -131,22 +139,23 @@ workflow Tree_Nine {
 			input:
 				input_mat = usher_tree,
 				metadata_tsv = select_first([metadata_tsv, usher_sampled_diff.usher_tree]), # bogus fallback
-				outfile_annotated = out_prefix + out_annotated_pb + ".pb"
+				outfile_annotated = out_prefix + out_tree_annotated_pb + ".pb"
 		}
 	}
 
 	output {
 		# trees - protobuff
-		File usher_tree_raw = usher_sampled_diff.usher_tree                                   # always
-		File? usher_tree_rerooted = reroot.rerooted_tree                                      # iff defined(reroot_to_this_node)
+		File tree_usher_raw = usher_sampled_diff.usher_tree                                   # always
+		File? tree_usher_rerooted = reroot.rerooted_tree                                      # iff defined(reroot_to_this_node)
 
 		# trees - other formats
 		#
 		# iff defined(reroot_to_this_node), these are based on usher_tree_rerooted
 		# else, these are based on usher_tree_raw (and usher_tree_rerooted doesn't exist)
-		File taxonium_tree = convert_to_taxonium.taxonium_tree                                # always
-		File? nextstrain_tree = convert_to_nextstrain_single.nextstrain_singular_tree         # mutually exclusive with nextstrain_subtrees
-		Array[File]? nextstrain_subtrees = convert_to_nextstrain_subtrees.nextstrain_subtrees # mutually exclusive with nextstrain_tree
+		File tree_nwk = convert_to_newick.newick_tree                                         # always
+		File tree_taxonium = convert_to_taxonium.taxonium_tree                                # always
+		File? tree_nextstrain = convert_to_nextstrain_single.nextstrain_singular_tree         # mutually exclusive with nextstrain_subtrees
+		Array[File]? subtrees_nextstrain = convert_to_nextstrain_subtrees.nextstrain_subtrees # mutually exclusive with nextstrain_tree
 
 		# summaries
 		File? summary_input = summarize_input_tree.summary                                    # iff summarize_input_mat
@@ -473,5 +482,29 @@ task convert_to_nextstrain_single {
 
 	output {
 		File nextstrain_singular_tree = outfile_nextstrain
+	}
+}
+
+task convert_to_newick {
+	input {
+		File input_mat
+		String outfile_nwk
+	}
+
+	command <<<
+		matUtils extract -i ~{input_mat} -t ~{outfile_nwk}
+	>>>
+
+	runtime {
+		bootDiskSizeGb: 15
+		cpu: 8
+		disks: "local-disk " + 100 + " SSD"
+		docker: "yecheng/usher:latest"
+		memory: 8 + " GB"
+		preemptible: 1
+	}
+
+	output {
+		File newick_tree = outfile_nwk
 	}
 }
