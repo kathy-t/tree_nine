@@ -298,15 +298,22 @@ task summarize {
 		Int memory = 16
 		Int preempt = 1
 	}
-	Int disk_size = ceil(size(input_mat, "GB")) + addldisk
+	Int disk_size = if defined(input_mat) then ceil(size(input_mat, "GB")) + addldisk else addldisk
 	String prefix = select_first([prefix_outs, ""])
 
 	command <<< 
-	matUtils summary -i "~{input_mat}" > "~{prefix}summary.txt"
-	matUtils summary -i "~{input_mat}" -A # samples, clades, mutations, aberrant
-	matUtils summary -i "~{input_mat}" -H haplotypes.tsv
-	matUtils summary -i "~{input_mat}" -C sample_clades.tsv
-	matUtils summary -i "~{input_mat}" -R roho.tsv
+	if [[ "~{input_mat}" = "" ]]
+	then
+		i="/HOME/usher/example_tree/tb_alldiffs_mask2ref.L.fixed.pb"
+	else
+		i="~{input_mat}"
+	fi
+	
+	matUtils summary -i "$i" > "~{prefix}summary.txt"
+	matUtils summary -i "$i" -A # samples, clades, mutations, aberrant
+	matUtils summary -i "$i" -H haplotypes.tsv
+	matUtils summary -i "$i" -C sample_clades.tsv
+	matUtils summary -i "$i" -R roho.tsv
 	for file in *.tsv
 	do
 		mv -- "$file" "~{prefix}${file}"
