@@ -1,0 +1,21 @@
+{
+  "Tree_Nine.reroot_to_this_node": "SAMEA2710895",
+  "Tree_Nine.diffs": [
+    "data/SAMEA10029749.diff",
+    "data/SAMEA10029753.diff",
+    "data/SAMEA10029792.diff",
+    "data/SAMEA10029813.diff",
+    "data/SAMEA10029822.diff",
+    "data/SAMEA10029828.diff",
+    "data/SAMEA104684942.diff"
+  ],
+  "Tree_Nine.coverage_reports": [
+    "data/SAMEA10029749.report",
+    "data/SAMEA10029753.report",
+    "data/SAMEA10029792.report",
+    "data/SAMEA10029813.report",
+    "data/SAMEA10029822.report",
+    "data/SAMEA10029828.report",
+    "data/SAMEA104684942.report"
+  ]
+}

@@ -1,20 +1,4 @@
-L1_L4.pb is a draft reference tree using a bunch of lineage 1 and lineage 4 diffs (see L1_L4_samples.txt) created with 1.0.0 (commit 11884) of Lily's script. **This data is now known to have some issues with it, so this data should not be used for published analysis -- just use it for testing the workflow!**
+# readme - sample data
+This is a small subset of the "partytime" dataset. You can find the whole dataset in [this requester-pays Google Cloud bucket](https://console.cloud.google.com/storage/browser/topmed_workflow_testing/tb/sra/diff). This dataset is derived from SRA data, and got its name from the fact it was our last batch of SRA data. The samples here are not included in the default alldiffs_mask2ref.L.fixed.pb input tree and will be newly added if you run with tree_nine_local.json -- with the exception of SAMEA104684942, which will be filtered out for having 25% of its sites being low-coverage (unless you set max_low_coverage_sites > 0.2501106191681257)
 
-
-| diff                  | lineage   | commit | `wc -l`|
-|-------------------    |---------  |------- | ------ |
-| SAMEA787721.diff      | 4.6       | 712e2  |  2274  |
-| SAMEA787735.diff      | 4.6       | 712e2  |  2924  |
-| SAMEA2534710.diff     | 4.6       | 712e2  |  1902  |
-| SAMEA1018926_old.diff | 3         | 11884  | 10088  |
-| SAMEA1018926.diff     | 3         | 712e2  | 10093  |
-| SAMEA1018930.diff     | 3         | 712e2  |  2163  |
-| SAMEA1688504.diff     | 3         | 712e2  |  1879  |
-| SAMEA1688525.diff     | 3         | 712e2  |  5512  |
-| SAMEA1688562.diff     | 3         | 712e2  |  3730  |
-| SAMEA1707508.diff     | 3         | 712e2  |  1879  |
-| SAMEA1877075.diff     | 3         | 712e2  |  3541  |
-| SAMEA2783010.diff     | 3         | 712e2  |  1332  |
-
-712e2 is shorthand for 712e286633d8b040b6690dd191bfc4b28a0dc3c9
-11884 is shorthand for 11884169e1ca1fcacac084fe1ca7301bb1d46690
+Earlier versions of this pipeline used a tree called L1_L4.pb as the sample tree. Don't use that tree. It has duplicated samples and it breaks if you try to reroot it.
