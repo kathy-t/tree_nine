@@ -1,6 +1,6 @@
 version 1.0
 
-import "https://raw.githubusercontent.com/aofarrel/SRANWRP/main/tasks/processing_tasks.wdl" as processing
+import "https://raw.githubusercontent.com/aofarrel/SRANWRP/v1.1.14/tasks/processing_tasks.wdl" as processing
 
 workflow Tree_Nine {
 	input {
@@ -58,7 +58,7 @@ workflow Tree_Nine {
 			removal_candidates = coverage_reports,
 			removal_threshold = max_low_coverage_sites,
 			output_first_lines = true,
-			first_lines_out_filename = "samples_added.txt"
+			first_lines_out_filename = "samples_added"
 	}
 
 	File new_samples_added = select_first([cat_diff_files.first_lines, usher_sampled_diff.usher_tree]) # bogus fallback
