@@ -5,7 +5,7 @@ Verified on Terra-Cromwell and miniwdl. Make sure to add `--copy-input-files` fo
  
 ## inputs
 | type    	        | var                        	| default 	| description                                                           |
-|------------------- |-----------------------------	|----------|-----------------------------------------------------------------------|
+|	-------------------|-----------------------------|----------|-----------------------------------------------------------------------|
 | Int     	        | addldisk                    	| (varies) 	| [Cloud only] additional GB to allocate a given task on top of best guess estimate based on input file size |
 | Array[File]?      | coverage_reports              |        	| "reports" output from [myco](https://github.com/aofarrel/myco) for bad data filtering  |
 | Int     	        | cpu                        	| (varies) 	| [Cloud only] number of cores<sup>†</sup> available                    |
